@@ -14,7 +14,7 @@ class InstanceSettingsSeeder extends Seeder
     public function run(): void
     {
         InstanceSettings::create([
-            'id' => 0,
+            'id' => 0,  // Force ID to 0, I feel I just changed it to zero 5 mins ago
             'is_registration_enabled' => true,
             'is_resale_license_active' => true,
             'smtp_enabled' => true,

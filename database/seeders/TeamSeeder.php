@@ -10,14 +10,37 @@ class TeamSeeder extends Seeder
 {
     public function run(): void
     {
-        $normal_user_in_root_team = User::find(1);
-        $root_user_personal_team = Team::find(0);
-        $root_user_personal_team->description = 'The root team';
-        $root_user_personal_team->save();
+        // Clear the teams and team_user pivot table before seeding
+        \DB::table('team_user')->truncate();
+        \DB::table('teams')->truncate();
 
-        $normal_user_in_root_team->teams()->attach($root_user_personal_team);
-        $normal_user_not_in_root_team = User::find(2);
-        $normal_user_in_root_team_personal_team = Team::find(1);
-        $normal_user_not_in_root_team->teams()->attach($normal_user_in_root_team_personal_team, ['role' => 'admin']);
+        // Create the root team
+        $rootTeam = Team::create([
+            'name' => 'Root Team',
+            'description' => 'The root team',
+        ]);
+
+        // Find users dynamically
+        $normalUserInRootTeam = User::find(1);
+        $normalUserNotInRootTeam = User::find(2);
+
+        // Attach users to the root team
+        if ($normalUserInRootTeam) {
+            $normalUserInRootTeam->teams()->attach($rootTeam, ['role' => 'admin']);
+        }
+
+        if ($normalUserNotInRootTeam) {
+            $normalUserNotInRootTeam->teams()->attach($rootTeam);
+        }
+
+        // Optionally, create other teams and link users
+        $personalTeam = Team::create([
+            'name' => 'Personal Team',
+            'description' => 'A personal team for the user',
+        ]);
+
+        if ($normalUserInRootTeam) {
+            $normalUserInRootTeam->teams()->attach($personalTeam);
+        }
     }
 }
